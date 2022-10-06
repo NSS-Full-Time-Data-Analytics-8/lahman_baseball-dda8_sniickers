@@ -186,3 +186,21 @@ WHERE w = most_wins_Halloween AND wswin ='Y'
 -- attendance divided by number of games). Only consider parks where 
 -- there were at least 10 games played. Report the park name, team name,
 -- and average attendance. Repeat for the lowest 5 average attendance.
+
+SELECT homegames.team, parks.park_name AS park_name, (homegames.attendance / homegames.games) AS avg_attendance
+FROM homegames INNER JOIN parks USING(park)
+WHERE year = 2016
+GROUP BY homegames.team, parks.park_name,homegames.attendance, homegames.games
+HAVING games > 9
+ORDER BY avg_attendance DESC
+LIMIT 5;
+
+--BOTTOM 5
+SELECT homegames.team, parks.park_name AS park_name, (homegames.attendance / homegames.games) AS avg_attendance
+FROM homegames INNER JOIN parks USING(park)
+WHERE year = 2016
+GROUP BY homegames.team, parks.park_name,homegames.attendance, homegames.games
+HAVING games > 9
+ORDER BY avg_attendance
+LIMIT 5;
+

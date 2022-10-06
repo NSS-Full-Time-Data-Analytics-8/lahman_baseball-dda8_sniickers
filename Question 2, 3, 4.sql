@@ -29,7 +29,7 @@ SELECT CONCAT( p.namefirst,' ',p.namelast) AS name, p.height, ap.g_all, tm.name
 SELECT DISTINCT CONCAT(p.namefirst, ' ', p.namelast) AS player_name , t.name AS team, a.g_all AS "Games Played"
 FROM people AS p
 JOIN appearances AS a
-ON p.playerid=a.playerid  eee   
+ON p.playerid=a.playerid   
 JOIN teams AS t
 ON a.teamid=t.teamid
 WHERE height =
@@ -138,9 +138,51 @@ ORDER BY sb_percentage DESC;
 -- (7)From 1970 – 2016, what is the largest number of wins for a team that did not win 
 -- the world series? What is the smallest number of wins for a team that did win the world
 -- series? Doing this will probably result in an unusually small number of wins for a world
--- series champion – determine why this is the case. Then redo your query, excluding the problem year.
+-- series champion – determine why this is the case. Then redo your query, 
+-- excluding the problem year.
 -- How often from 1970 – 2016 was it the case that a team with the most wins
 -- also won the world series? What percentage of the time?   
+-- -Most Regular season wins w/o winning world series
 
+--Most Regular season wins w/o winning world series
+SELECT yearid, name, MAX(t.w) AS most_wins_Mandla_ws
+FROM teams AS t
+WHERE yearid > 1969 AND t.wswin = 'N'
+GROUP BY yearid, name
+ORDER BY most_wins_Mandla_ws DESC;
 
+--Least Regular seasons wins as world series champions
 
+SELECT yearid, name, MIN(t.w) AS most_wins_wo_ws_MBATHA
+FROM teams AS t
+WHERE yearid > 1969 AND t.wswin = 'Y'
+GROUP BY yearid, name
+ORDER BY most_wins_wo_ws_MBATHA;
+
+--Least Regular seasons wins as world series champions in non-lockout season
+
+SELECT yearid, name, MIN(t.w) AS most_wins_wo_ws_MANDLA
+FROM teams AS t
+WHERE yearid > 1969 AND yearid <> 1981 AND t.wswin = 'Y'
+GROUP BY yearid, name
+ORDER BY most_wins_wo_ws_MANDLA
+
+--Percentage of time teams w/ most wins won World Series
+
+WITH sub AS (SELECT yearid,  MAX(t.w) AS most_wins_Halloween
+			FROM teams AS t
+			WHERE yearid > 1969 
+			GROUP BY yearid
+			ORDER BY most_wins_Halloween DESC)
+		
+SELECT (ROUND(COUNT(DISTINCT teams.yearid)::decimal * 100,2) / 47) AS "% of teams w/ most wins won World Series "
+FROM sub
+INNER JOIN teams USING (yearid) 
+WHERE w = most_wins_Halloween AND wswin ='Y' 
+--------------------------------------------------------------------------------------------------------------
+-- (8) Using the attendance figures from the homegames table,
+-- find the teams and parks which had the top 5 average attendance
+-- per game in 2016 (where average attendance is defined as total
+-- attendance divided by number of games). Only consider parks where 
+-- there were at least 10 games played. Report the park name, team name,
+-- and average attendance. Repeat for the lowest 5 average attendance.
